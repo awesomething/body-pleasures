@@ -40,28 +40,28 @@ export function HeroSection() {
         <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="aspect-square rounded-2xl overflow-hidden">
             <img
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Artisan_Soap%5B1%5D.JPG-LJObqRHG2mJDmkfMDvYBaGf3E4TKep.jpeg"
+              src="/images/design-mode/Artisan_Soap%5B1%5D.JPG.jpeg"
               alt="Artisan Soaps Collection"
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
             />
           </div>
           <div className="aspect-square rounded-2xl overflow-hidden">
             <img
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Body%20Cream-N9t1RSSJNw9bXCQNVeD6YpeOzKUB1S.jpg"
+              src="/images/design-mode/Body%20Cream.jpg"
               alt="Body Creams"
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
             />
           </div>
           <div className="aspect-square rounded-2xl overflow-hidden">
             <img
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Concrete_Candles%5B1%5D.JPG-tJRWLpPssq5xtfSrv2DBK3nC2CRugO.jpeg"
+              src="/images/design-mode/Concrete_Candles%5B1%5D.JPG.jpeg"
               alt="Concrete Candles"
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
             />
           </div>
           <div className="aspect-square rounded-2xl overflow-hidden">
             <img
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Beard_Products%5B1%5D-pQ8ZlFQCVAS3bvrmnmPhxfxovGmpAo.jpg"
+              src="/images/design-mode/Beard_Products%5B1%5D.jpg"
               alt="Beard Care Products"
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
             />

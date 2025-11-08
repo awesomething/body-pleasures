@@ -27,7 +27,7 @@ export function AboutSection() {
           <div className="relative">
             <div className="aspect-square rounded-3xl overflow-hidden">
               <img
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/20240921_163032%5B1%5D.JPG-eq1mXOXggBhp9SKyjCIhhH5XNKJTMh.jpeg"
+                src="/images/design-mode/20240921_163032%5B1%5D.JPG.jpeg"
                 alt="Ms V's Body Pleasures Market Booth"
                 className="w-full h-full object-cover"
               />

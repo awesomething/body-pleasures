@@ -19,7 +19,7 @@ export function FeaturedProducts() {
           <Card className="overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300">
             <div className="aspect-[3/4] overflow-hidden">
               <img
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Artisan_Soap%5B1%5D.JPG-LJObqRHG2mJDmkfMDvYBaGf3E4TKep.jpeg"
+                src="/images/design-mode/Artisan_Soap%5B1%5D.JPG.jpeg"
                 alt="Artisan Soap Collection"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               />
@@ -38,7 +38,7 @@ export function FeaturedProducts() {
           <Card className="overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300">
             <div className="aspect-[3/4] overflow-hidden">
               <img
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Beard_Products%5B1%5D-pQ8ZlFQCVAS3bvrmnmPhxfxovGmpAo.jpg"
+                src="/images/design-mode/Beard_Products%5B1%5D.jpg"
                 alt="Beard Care Collection"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               />
@@ -58,7 +58,7 @@ export function FeaturedProducts() {
           <Card className="overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
             <div className="aspect-square overflow-hidden">
               <img
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Body%20Cream-N9t1RSSJNw9bXCQNVeD6YpeOzKUB1S.jpg"
+                src="/images/design-mode/Body%20Cream.jpg"
                 alt="Body Cream"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               />
@@ -72,7 +72,7 @@ export function FeaturedProducts() {
           <Card className="overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
             <div className="aspect-square overflow-hidden">
               <img
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Relief_Products%5B1%5D.JPG-vRg5JeDBkmzAKszdChqQnXDlVFT18g.jpeg"
+                src="/images/design-mode/Relief_Products%5B1%5D.JPG.jpeg"
                 alt="Pain Relief Oil"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               />
@@ -86,7 +86,7 @@ export function FeaturedProducts() {
           <Card className="overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
             <div className="aspect-square overflow-hidden">
               <img
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Concrete_Candles%5B1%5D.JPG-tJRWLpPssq5xtfSrv2DBK3nC2CRugO.jpeg"
+                src="/images/design-mode/Concrete_Candles%5B1%5D.JPG.jpeg"
                 alt="Concrete Candles"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               />
@@ -100,7 +100,7 @@ export function FeaturedProducts() {
           <Card className="overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
             <div className="aspect-square overflow-hidden">
               <img
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/20250912_185335%5B1%5D.JPG-juAZNKXLXO2c1B5pMQNDrRYMEs2EZB.jpeg"
+                src="/images/design-mode/20250912_185335%5B1%5D.JPG.jpeg"
                 alt="Body Sprays"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               />
