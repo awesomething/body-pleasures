@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
-export function FeaturedProducts() {
+export function FeaturedProducts () {
   return (
     <section id="shop" className="py-24 px-4 sm:px-6 lg:px-8 bg-accent/5">
       <div className="max-w-7xl mx-auto">
@@ -19,7 +19,7 @@ export function FeaturedProducts() {
           <Card className="overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300">
             <div className="aspect-[3/4] overflow-hidden">
               <img
-                src="/images/design-mode/Artisan_Soap%5B1%5D.JPG.jpeg"
+                src="/images/design-mode/Artisan_Soap%255B1%255D.JPG.jpeg"
                 alt="Artisan Soap Collection"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               />
@@ -38,7 +38,7 @@ export function FeaturedProducts() {
           <Card className="overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300">
             <div className="aspect-[3/4] overflow-hidden">
               <img
-                src="/images/design-mode/Beard_Products%5B1%5D.jpg"
+                src="/images/design-mode/Beard_Products%255B1%255D.jpg"
                 alt="Beard Care Collection"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               />
@@ -58,7 +58,7 @@ export function FeaturedProducts() {
           <Card className="overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
             <div className="aspect-square overflow-hidden">
               <img
-                src="/images/design-mode/Body%20Cream.jpg"
+                src="/images/design-mode/Body%2520Cream.jpg"
                 alt="Body Cream"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               />
@@ -72,7 +72,7 @@ export function FeaturedProducts() {
           <Card className="overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
             <div className="aspect-square overflow-hidden">
               <img
-                src="/images/design-mode/Relief_Products%5B1%5D.JPG.jpeg"
+                src="/images/design-mode/Relief_Products%255B1%255D.JPG.jpeg"
                 alt="Pain Relief Oil"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               />
@@ -86,7 +86,7 @@ export function FeaturedProducts() {
           <Card className="overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
             <div className="aspect-square overflow-hidden">
               <img
-                src="/images/design-mode/Concrete_Candles%5B1%5D.JPG.jpeg"
+                src="/images/design-mode/Concrete_Candles%255B1%255D.JPG.jpeg"
                 alt="Concrete Candles"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               />
@@ -100,7 +100,7 @@ export function FeaturedProducts() {
           <Card className="overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
             <div className="aspect-square overflow-hidden">
               <img
-                src="/images/design-mode/20250912_185335%5B1%5D.JPG.jpeg"
+                src="/images/design-mode/20250912_185335%255B1%255D.JPG.jpeg"
                 alt="Body Sprays"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
               />

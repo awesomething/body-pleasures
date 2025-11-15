@@ -18,7 +18,7 @@ const values = [
   },
 ]
 
-export function AboutSection() {
+export function AboutSection () {
   return (
     <section id="about" className="py-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -27,7 +27,7 @@ export function AboutSection() {
           <div className="relative">
             <div className="aspect-square rounded-3xl overflow-hidden">
               <img
-                src="/images/design-mode/20240921_163032%5B1%5D.JPG.jpeg"
+                src="/images/design-mode/20240921_163032%255B1%255D.JPG.jpeg"
                 alt="Ms V's Body Pleasures Market Booth"
                 className="w-full h-full object-cover"
               />

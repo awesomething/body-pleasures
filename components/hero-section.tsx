@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Sparkles } from "lucide-react"
 
-export function HeroSection() {
+export function HeroSection () {
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-16">
       <div className="max-w-6xl w-full mx-auto text-center">
@@ -40,28 +40,28 @@ export function HeroSection() {
         <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="aspect-square rounded-2xl overflow-hidden">
             <img
-              src="/images/design-mode/Artisan_Soap%5B1%5D.JPG.jpeg"
+              src="/images/design-mode/Artisan_Soap%255B1%255D.JPG.jpeg"
               alt="Artisan Soaps Collection"
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
             />
           </div>
           <div className="aspect-square rounded-2xl overflow-hidden">
             <img
-              src="/images/design-mode/Body%20Cream.jpg"
+              src="/images/design-mode/Body%2520Cream.jpg"
               alt="Body Creams"
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
             />
           </div>
           <div className="aspect-square rounded-2xl overflow-hidden">
             <img
-              src="/images/design-mode/Concrete_Candles%5B1%5D.JPG.jpeg"
+              src="/images/design-mode/Concrete_Candles%255B1%255D.JPG.jpeg"
               alt="Concrete Candles"
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
             />
           </div>
           <div className="aspect-square rounded-2xl overflow-hidden">
             <img
-              src="/images/design-mode/Beard_Products%5B1%5D.jpg"
+              src="/images/design-mode/Beard_Products%255B1%255D.jpg"
               alt="Beard Care Products"
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
             />
