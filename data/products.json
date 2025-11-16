@@ -1,0 +1,35 @@
+[
+  {
+    "id": "artisan-soap",
+    "name": "Artisan Soap Collection",
+    "description": "Choose from over 30 unique scents and formulations",
+    "price": 6.0,
+    "sku": "SOAP-001",
+    "weight": 0.2,
+    "variants": [
+      { "id": "artisan-soap-1", "name": "Lavender", "sku": "SOAP-001-LAV", "price": 6.0, "stock": 12, "lowStockThreshold": 3 },
+      { "id": "artisan-soap-2", "name": "Citrus", "sku": "SOAP-001-CIT", "price": 6.0, "stock": 8, "lowStockThreshold": 3 }
+    ]
+  },
+  {
+    "id": "beard-care",
+    "name": "Complete Beard Care",
+    "description": "Premium oils, washes, balms, and conditioners",
+    "price": 5.0,
+    "sku": "BEARD-001",
+    "weight": 0.15,
+    "variants": [
+      { "id": "beard-1", "name": "Oil", "sku": "BEARD-001-OIL", "price": 5.0, "stock": 20, "lowStockThreshold": 5 }
+    ]
+  },
+  {
+    "id": "body-cream",
+    "name": "Body Cream",
+    "price": 8.0,
+    "sku": "BODY-001",
+    "weight": 0.4,
+    "variants": [
+      { "id": "body-cream-1", "name": "Default", "sku": "BODY-001-DEF", "price": 8.0, "stock": 6, "lowStockThreshold": 2 }
+    ]
+  }
+]
