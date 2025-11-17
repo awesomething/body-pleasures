@@ -1,0 +1,274 @@
+{
+    "name": "📦 Inventory & Operations Management",
+    "description": "Automate inventory monitoring: low stock alerts, supplier sync, and stock updates",
+    "active": true,
+    "nodes": [
+        {
+            "parameters": {
+                "trigger": "every",
+                "unit": "minutes",
+                "value": 1440
+            },
+            "id": "schedule_trigger",
+            "name": "Schedule: Daily at 1 AM",
+            "type": "n8n-nodes-base.cron",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "authentication": "bearerToken",
+                "url": "http://localhost:3000/api/products/inventory",
+                "method": "GET",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer {{env['CLASSICVISA_API_KEY']}}"
+                        }
+                    ]
+                }
+            },
+            "id": "fetch_inventory",
+            "name": "HTTP: Fetch All Inventory",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 2,
+            "position": [
+                500,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const products = $input.all()[0].body.products || [];\nconst lowStock = products.filter(p => p.stock < 10);\nreturn { lowStockItems: lowStock, totalLowStock: lowStock.length };"
+            },
+            "id": "filter_low_stock",
+            "name": "Code: Filter Low Stock (<10)",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                750,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "boolean": [
+                        {
+                            "value1": "={{$node[\"filter_low_stock\"].json.totalLowStock}}",
+                            "operation": ">",
+                            "value2": 0
+                        }
+                    ]
+                }
+            },
+            "id": "check_has_low_stock",
+            "name": "If: Has Low Stock Items",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                1000,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const items = $input.all()[0].lowStockItems || [];\nconst message = items.map(p => `• ${p.name}: ${p.stock} units remaining`).join('\\n');\nreturn { slackText: `⚠️ **Low Stock Alert**\\n\\nThe following items have less than 10 units:\\n${message}\\n\\nPlease reorder immediately!` };"
+            },
+            "id": "format_slack_message",
+            "name": "Code: Format Slack Message",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1250,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "text": "={{$node[\"format_slack_message\"].json.slackText}}",
+                "channel": "#inventory",
+                "username": "Inventory Bot"
+            },
+            "id": "slack_alert",
+            "name": "Slack: Send Low Stock Alert",
+            "type": "n8n-nodes-base.slack",
+            "typeVersion": 1,
+            "position": [
+                1500,
+                200
+            ],
+            "credentials": {
+                "slackApi": "classVisa_slack"
+            }
+        },
+        {
+            "parameters": {
+                "authentication": "oauth2",
+                "url": "{{env['SUPPLIER_SPREADSHEET_URL']}}",
+                "method": "GET"
+            },
+            "id": "fetch_supplier_csv",
+            "name": "HTTP: Fetch Supplier CSV",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 2,
+            "position": [
+                500,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const csv = $input.all()[0].body;\nconst rows = csv.split('\\n').slice(1);\nconst products = rows.map(row => {\n  const [sku, name, quantity] = row.split(',');\n  return { sku: sku?.trim(), name: name?.trim(), stock: parseInt(quantity?.trim() || 0) };\n});\nreturn { supplierProducts: products };"
+            },
+            "id": "parse_supplier_csv",
+            "name": "Code: Parse Supplier CSV",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                750,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "resource": "executionData",
+                "jsCode": "const items = $input.all()[0].supplierProducts || [];\nconst updates = [];\nitems.forEach(item => {\n  updates.push({\n    method: 'PATCH',\n    url: `http://localhost:3000/api/products/${item.sku}`,\n    headers: { 'Authorization': `Bearer {{env['CLASSICVISA_API_KEY']}}` },\n    body: { stock: item.stock }\n  });\n});\nreturn { batchUpdates: updates };"
+            },
+            "id": "prepare_batch_updates",
+            "name": "Code: Prepare Batch Updates",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1000,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "nodeVersion": 2,
+                "endpoint": "/api/products/sync-inventory",
+                "method": "POST",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer {{env['CLASSICVISA_API_KEY']}}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParametersJson": "={{JSON.stringify($node[\"prepare_batch_updates\"].json.batchUpdates)}}"
+            },
+            "id": "sync_inventory_api",
+            "name": "HTTP: Sync Inventory to Store",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 2,
+            "position": [
+                1250,
+                500
+            ]
+        }
+    ],
+    "connections": {
+        "schedule_trigger": {
+            "main": [
+                [
+                    {
+                        "node": "fetch_inventory",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "fetch_supplier_csv",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "fetch_inventory": {
+            "main": [
+                [
+                    {
+                        "node": "filter_low_stock",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "filter_low_stock": {
+            "main": [
+                [
+                    {
+                        "node": "check_has_low_stock",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "check_has_low_stock": {
+            "main": [
+                [
+                    {
+                        "node": "format_slack_message",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "format_slack_message": {
+            "main": [
+                [
+                    {
+                        "node": "slack_alert",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "fetch_supplier_csv": {
+            "main": [
+                [
+                    {
+                        "node": "parse_supplier_csv",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "parse_supplier_csv": {
+            "main": [
+                [
+                    {
+                        "node": "prepare_batch_updates",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "prepare_batch_updates": {
+            "main": [
+                [
+                    {
+                        "node": "sync_inventory_api",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

@@ -1,0 +1,269 @@
+{
+    "name": "🛍️ Order & Fulfillment Automation",
+    "description": "Automate order processing: team notifications, order logging to Google Sheets, and PDF invoice generation",
+    "active": true,
+    "nodes": [
+        {
+            "parameters": {
+                "path": "orders/new",
+                "protocol": "https",
+                "method": "POST"
+            },
+            "id": "webhook_trigger",
+            "name": "Webhook: New Order",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ],
+            "webhookId": "{{CLASSICVISA_ORDER_WEBHOOK_ID}}"
+        },
+        {
+            "parameters": {
+                "text": "📦 **New Order Received!**\n*Order ID:* {{$node[\"webhook_trigger\"].json.body.order.id}}\n*Customer:* {{$node[\"webhook_trigger\"].json.body.order.shippingName}}\n*Email:* {{$node[\"webhook_trigger\"].json.body.order.shippingEmail}}\n*Total:* ${{($node[\"webhook_trigger\"].json.body.order.total / 100).toFixed(2)}}\n*Items:* {{$node[\"webhook_trigger\"].json.body.order.items.length}} item(s)\n*Status:* {{$node[\"webhook_trigger\"].json.body.order.status}}\n*Date:* {{$node[\"webhook_trigger\"].json.body.order.createdAt}}",
+                "channel": "#orders",
+                "username": "Order Bot"
+            },
+            "id": "slack_notification",
+            "name": "Slack: Team Notification",
+            "type": "n8n-nodes-base.slack",
+            "typeVersion": 1,
+            "position": [
+                500,
+                150
+            ],
+            "credentials": {
+                "slackApi": "classVisa_slack"
+            }
+        },
+        {
+            "parameters": {
+                "values": {
+                    "string": [
+                        {
+                            "name": "Order ID",
+                            "value": "={{$node[\"webhook_trigger\"].json.body.order.id}}"
+                        },
+                        {
+                            "name": "Customer Name",
+                            "value": "={{$node[\"webhook_trigger\"].json.body.order.shippingName}}"
+                        },
+                        {
+                            "name": "Email",
+                            "value": "={{$node[\"webhook_trigger\"].json.body.order.shippingEmail}}"
+                        },
+                        {
+                            "name": "Total",
+                            "value": "={{$node[\"webhook_trigger\"].json.body.order.total / 100}}"
+                        },
+                        {
+                            "name": "Items Count",
+                            "value": "={{$node[\"webhook_trigger\"].json.body.order.items.length}}"
+                        },
+                        {
+                            "name": "Status",
+                            "value": "={{$node[\"webhook_trigger\"].json.body.order.status}}"
+                        },
+                        {
+                            "name": "Created At",
+                            "value": "={{$node[\"webhook_trigger\"].json.body.order.createdAt}}"
+                        },
+                        {
+                            "name": "Shipping Address",
+                            "value": "={{$node[\"webhook_trigger\"].json.body.order.shippingAddress}}"
+                        }
+                    ]
+                },
+                "mode": "overwrite"
+            },
+            "id": "set_sheet_data",
+            "name": "Data: Prepare Sheet Row",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 1,
+            "position": [
+                500,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "authentication": "oauth2",
+                "spreadsheetId": "{{env['GOOGLE_SHEETS_SALES_ID']}}",
+                "range": "Orders!A:H",
+                "valueInputOption": "USER_ENTERED",
+                "values": "={{Object.values($node[\"set_sheet_data\"].json).map(v => [v])}}"
+            },
+            "id": "google_sheets_log",
+            "name": "Google Sheets: Log Order",
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 2,
+            "position": [
+                750,
+                300
+            ],
+            "credentials": {
+                "googleSheetsOAuth2Api": "classVisa_google_sheets"
+            }
+        },
+        {
+            "parameters": {
+                "resource": "document",
+                "operation": "create",
+                "title": "Invoice-{{$node[\"webhook_trigger\"].json.body.order.id}}",
+                "body": "<h1>Invoice</h1><p><strong>Order ID:</strong> {{$node[\"webhook_trigger\"].json.body.order.id}}</p><p><strong>Customer:</strong> {{$node[\"webhook_trigger\"].json.body.order.shippingName}}</p><p><strong>Email:</strong> {{$node[\"webhook_trigger\"].json.body.order.shippingEmail}}</p><hr><h2>Order Items</h2><p>Total items: {{$node[\"webhook_trigger\"].json.body.order.items.length}}</p><hr><p><strong>Total Amount:</strong> ${{($node[\"webhook_trigger\"].json.body.order.total / 100).toFixed(2)}}</p><p><strong>Status:</strong> {{$node[\"webhook_trigger\"].json.body.order.status}}</p><p><strong>Date:</strong> {{$node[\"webhook_trigger\"].json.body.order.createdAt}}</p>"
+            },
+            "id": "google_docs_invoice",
+            "name": "Google Docs: Create Invoice",
+            "type": "n8n-nodes-base.googleDocs",
+            "typeVersion": 1,
+            "position": [
+                500,
+                450
+            ],
+            "credentials": {
+                "googleDocsOAuth2Api": "classVisa_google_docs"
+            }
+        },
+        {
+            "parameters": {
+                "authentication": "oauth2",
+                "driveId": "My Drive",
+                "parentFolderId": "{{env['GOOGLE_DRIVE_INVOICES_FOLDER']}}",
+                "resource": "folder",
+                "folderName": "Customer-{{$node[\"webhook_trigger\"].json.body.order.shippingEmail}}-{{$node[\"webhook_trigger\"].json.body.order.id}}"
+            },
+            "id": "google_drive_folder",
+            "name": "Google Drive: Create Customer Folder",
+            "type": "n8n-nodes-base.googleDrive",
+            "typeVersion": 1,
+            "position": [
+                750,
+                450
+            ],
+            "credentials": {
+                "googleDriveOAuth2Api": "classVisa_google_drive"
+            }
+        },
+        {
+            "parameters": {
+                "authentication": "oauth2",
+                "driveId": "My Drive",
+                "parentFolderId": "={{$node[\"google_drive_folder\"].json.id}}",
+                "fileId": "={{$node[\"google_docs_invoice\"].json.documentId}}",
+                "newFolderName": "Invoices"
+            },
+            "id": "google_drive_save_invoice",
+            "name": "Google Drive: Move Invoice to Folder",
+            "type": "n8n-nodes-base.googleDrive",
+            "typeVersion": 1,
+            "position": [
+                1000,
+                450
+            ],
+            "credentials": {
+                "googleDriveOAuth2Api": "classVisa_google_drive"
+            }
+        },
+        {
+            "parameters": {},
+            "id": "success_response",
+            "name": "Respond to Webhook",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                1250,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "webhook_trigger": {
+            "main": [
+                [
+                    {
+                        "node": "slack_notification",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "set_sheet_data",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "google_docs_invoice",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "slack_notification": {
+            "main": [
+                [
+                    {
+                        "node": "success_response",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "set_sheet_data": {
+            "main": [
+                [
+                    {
+                        "node": "google_sheets_log",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "google_sheets_log": {
+            "main": [
+                [
+                    {
+                        "node": "success_response",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "google_docs_invoice": {
+            "main": [
+                [
+                    {
+                        "node": "google_drive_folder",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "google_drive_folder": {
+            "main": [
+                [
+                    {
+                        "node": "google_drive_save_invoice",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "google_drive_save_invoice": {
+            "main": [
+                [
+                    {
+                        "node": "success_response",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

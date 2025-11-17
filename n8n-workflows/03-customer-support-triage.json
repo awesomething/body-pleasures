@@ -1,0 +1,301 @@
+{
+    "name": "⭐ Customer Support Triage & Review Analysis",
+    "description": "Automate customer support: sentiment analysis on reviews, ticket creation for negative feedback, and team alerts",
+    "active": true,
+    "nodes": [
+        {
+            "parameters": {
+                "path": "reviews/new",
+                "protocol": "https",
+                "method": "POST"
+            },
+            "id": "webhook_new_review",
+            "name": "Webhook: New Review Posted",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ],
+            "webhookId": "{{CLASSICVISA_REVIEW_WEBHOOK_ID}}"
+        },
+        {
+            "parameters": {
+                "model": "gpt-3.5-turbo",
+                "messages": {
+                    "messageUi": [
+                        {
+                            "contentType": "text",
+                            "content": "Analyze the sentiment of this customer review and respond ONLY with a JSON object in this format: {\"sentiment\": \"positive|neutral|negative\", \"score\": 0-1, \"reason\": \"brief explanation\"}.\n\nReview text: {{$node[\"webhook_new_review\"].json.body.review.text}}\n\nBe strict: only mark as positive if the review is clearly praising the product or experience. Mark as negative if there's any significant criticism or complaint."
+                        }
+                    ]
+                }
+            },
+            "id": "ai_sentiment_analysis",
+            "name": "OpenAI: Sentiment Analysis",
+            "type": "n8n-nodes-base.openaiChatModel",
+            "typeVersion": 1,
+            "position": [
+                500,
+                300
+            ],
+            "credentials": {
+                "openaiApi": "classVisa_openai"
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "let responseText = $input.all()[0].json.choices?.[0]?.message?.content || '{}';\nresponseText = responseText.replace(/^```json\\n|\\n```$/g, '').trim();\nconst parsed = JSON.parse(responseText);\nreturn { sentiment: parsed.sentiment, score: parsed.score, reason: parsed.reason };"
+            },
+            "id": "parse_sentiment",
+            "name": "Code: Parse Sentiment Result",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                750,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "string": [
+                        {
+                            "value1": "={{$node[\"parse_sentiment\"].json.sentiment}}",
+                            "operation": "equals",
+                            "value2": "negative"
+                        }
+                    ]
+                }
+            },
+            "id": "check_if_negative",
+            "name": "If: Sentiment is Negative",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                1000,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "authentication": "oauth2",
+                "apiVersion": "v2.0",
+                "subject": "🔴 HIGH PRIORITY: Negative Customer Review",
+                "description": "Customer: {{$node[\"webhook_new_review\"].json.body.review.customerName}}\nProduct: {{$node[\"webhook_new_review\"].json.body.review.productName}}\nRating: {{$node[\"webhook_new_review\"].json.body.review.rating}}/5\n\nReview Text:\n{{$node[\"webhook_new_review\"].json.body.review.text}}\n\nSentiment Analysis:\nScore: {{$node[\"parse_sentiment\"].json.score}}\nReason: {{$node[\"parse_sentiment\"].json.reason}}\n\nAction Required: Please respond to this customer immediately to address their concerns.",
+                "priority": 3,
+                "status": "open"
+            },
+            "id": "zendesk_create_ticket",
+            "name": "Zendesk: Create High Priority Ticket",
+            "type": "n8n-nodes-base.zendesk",
+            "typeVersion": 2,
+            "position": [
+                1250,
+                150
+            ],
+            "credentials": {
+                "zendeskApi": "classVisa_zendesk"
+            }
+        },
+        {
+            "parameters": {
+                "text": "🚨 **NEGATIVE REVIEW ALERT**\n*Customer:* {{$node[\"webhook_new_review\"].json.body.review.customerName}}\n*Product:* {{$node[\"webhook_new_review\"].json.body.review.productName}}\n*Rating:* {{$node[\"webhook_new_review\"].json.body.review.rating}}/5\n*Sentiment Score:* {{$node[\"parse_sentiment\"].json.score}}\n*Analysis:* {{$node[\"parse_sentiment\"].json.reason}}\n\n> {{$node[\"webhook_new_review\"].json.body.review.text}}\n\n⏱️ A high-priority support ticket has been created in Zendesk.",
+                "channel": "#support-alerts",
+                "username": "Review Monitor"
+            },
+            "id": "slack_negative_alert",
+            "name": "Slack: Alert Support Team",
+            "type": "n8n-nodes-base.slack",
+            "typeVersion": 1,
+            "position": [
+                1250,
+                300
+            ],
+            "credentials": {
+                "slackApi": "classVisa_slack"
+            }
+        },
+        {
+            "parameters": {
+                "text": "✅ **POSITIVE REVIEW**\n*Customer:* {{$node[\"webhook_new_review\"].json.body.review.customerName}}\n*Product:* {{$node[\"webhook_new_review\"].json.body.review.productName}}\n*Rating:* {{$node[\"webhook_new_review\"].json.body.review.rating}}/5\n*Sentiment Score:* {{$node[\"parse_sentiment\"].json.score}}\n\n> {{$node[\"webhook_new_review\"].json.body.review.text}}",
+                "channel": "#customer-praise",
+                "username": "Review Monitor"
+            },
+            "id": "slack_positive_feedback",
+            "name": "Slack: Share Positive Review",
+            "type": "n8n-nodes-base.slack",
+            "typeVersion": 1,
+            "position": [
+                1250,
+                450
+            ],
+            "credentials": {
+                "slackApi": "classVisa_slack"
+            }
+        },
+        {
+            "parameters": {
+                "resource": "executionData",
+                "jsCode": "const review = $input.all()[0].json.body.review;\nconst sentiment = $node[\"parse_sentiment\"].json.sentiment;\nreturn {\n  reviewId: review.id,\n  sentiment: sentiment,\n  score: $node[\"parse_sentiment\"].json.score,\n  customerEmail: review.customerEmail,\n  productId: review.productId,\n  timestamp: new Date().toISOString()\n};"
+            },
+            "id": "prepare_log_data",
+            "name": "Code: Prepare Logging Data",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1500,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "authentication": "oauth2",
+                "spreadsheetId": "{{env['GOOGLE_SHEETS_REVIEWS_ID']}}",
+                "range": "Reviews!A:F",
+                "valueInputOption": "USER_ENTERED",
+                "values": "={{[[Object.values($node[\"prepare_log_data\"].json).join('\t')]]}}"
+            },
+            "id": "log_review_analytics",
+            "name": "Google Sheets: Log Review Analytics",
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 2,
+            "position": [
+                1750,
+                300
+            ],
+            "credentials": {
+                "googleSheetsOAuth2Api": "classVisa_google_sheets"
+            }
+        },
+        {
+            "parameters": {},
+            "id": "respond_webhook",
+            "name": "Respond to Webhook",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                2000,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "webhook_new_review": {
+            "main": [
+                [
+                    {
+                        "node": "ai_sentiment_analysis",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "ai_sentiment_analysis": {
+            "main": [
+                [
+                    {
+                        "node": "parse_sentiment",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "parse_sentiment": {
+            "main": [
+                [
+                    {
+                        "node": "check_if_negative",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "prepare_log_data",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "check_if_negative": {
+            "main": [
+                [
+                    {
+                        "node": "zendesk_create_ticket",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "slack_negative_alert",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "slack_positive_feedback",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "zendesk_create_ticket": {
+            "main": [
+                [
+                    {
+                        "node": "respond_webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "slack_negative_alert": {
+            "main": [
+                [
+                    {
+                        "node": "respond_webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "slack_positive_feedback": {
+            "main": [
+                [
+                    {
+                        "node": "respond_webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "prepare_log_data": {
+            "main": [
+                [
+                    {
+                        "node": "log_review_analytics",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "log_review_analytics": {
+            "main": [
+                [
+                    {
+                        "node": "respond_webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
