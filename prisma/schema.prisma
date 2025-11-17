@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Cart {
+  id        String   @id @default(cuid())
+  sessionId String   @unique // session or user id
+  items     CartItem[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  variantId String?
+  name      String
+  price     Float
+  quantity  Int
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([cartId, productId, variantId])
+}
+
+model Order {
+  id           String   @id @default(cuid())
+  sessionId    String   // track which user/session placed it
+  items        String   // JSON array of order items
+  subtotal     Float
+  tax          Float    @default(0)
+  shipping     Float    @default(0)
+  total        Float
+  
+  // Shipping info
+  shippingName  String
+  shippingEmail String
+  shippingPhone String?
+  shippingAddress String
+  shippingCity  String
+  shippingState String
+  shippingZip   String
+  shippingCountry String
+  
+  // Billing info (same as shipping if not specified)
+  billingName   String?
+  billingEmail  String?
+  billingAddress String?
+  billingCity   String?
+  billingState  String?
+  billingZip    String?
+  billingCountry String?
+  
+  // Payment
+  paymentMethod String // "stripe" | "paypal" | "crypto"
+  stripeIntentId String? @unique
+  status        String  @default("pending") // pending, completed, failed, canceled
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
