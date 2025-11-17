@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
-import { Menu, X, ShoppingBag } from "lucide-react"
+import { Menu, X, ShoppingBag, User } from "lucide-react"
+import { useAuth } from "@/hooks/useAuth"
 
 export function Navigation () {
   const [isOpen, setIsOpen] = useState(false)
   const [cartCount, setCartCount] = useState(0)
+  const { user, loading } = useAuth()
 
   const fetchCartCount = async () => {
     try {
@@ -64,6 +66,8 @@ export function Navigation () {
             <a href="#contact" className="text-sm text-foreground/80 hover:text-foreground transition-colors">
               Contact
             </a>
+
+            {/* Cart Icon */}
             <Button asChild size="sm" variant="ghost">
               <Link href="/cart" className="relative">
                 <ShoppingBag className="h-4 w-4" />
@@ -74,6 +78,29 @@ export function Navigation () {
                 )}
               </Link>
             </Button>
+
+            {/* Auth Links */}
+            {!loading && (
+              <>
+                {user ? (
+                  <Button asChild size="sm" variant="ghost">
+                    <Link href="/profile" className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      Profile
+                    </Link>
+                  </Button>
+                ) : (
+                  <>
+                    <Button asChild size="sm" variant="ghost">
+                      <Link href="/auth/login">Log In</Link>
+                    </Button>
+                    <Button asChild size="sm">
+                      <Link href="/auth/register">Sign Up</Link>
+                    </Button>
+                  </>
+                )}
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
