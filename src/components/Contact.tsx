@@ -30,7 +30,7 @@ export default function Contact() {
       const time = now.toTimeString().split(" ")[0]; // HH:mm:ss
   
       const res = await fetch(
-        "https://tundebrain.app.n8n.cloud/webhook/contact",
+        "https://thebrain02.app.n8n.cloud/webhook/contact",
         {
           method: "POST",
           headers: {

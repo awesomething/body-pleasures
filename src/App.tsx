@@ -144,21 +144,20 @@ function App() {
               <p className="text-white/80">Explore our full range of artisan wellness products</p>
             </div>
 
-            <div className="flex gap-4 justify-center flex-wrap mb-8">
+            <div className="category-tabs">
               {['all','soaps','creams','candles','beard','relief','sprays'].map(cat => (
                 <button
                   key={cat}
-                  className={`px-6 py-2 rounded-full border ${
-                    filter === cat
-                      ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-black border-yellow-400'
-                      : 'bg-[rgba(26,26,26,0.6)] border-[rgba(255,215,0,0.3)] text-white'
-                  }`}
+                  className={`category-tab ${filter === cat ? 'active' : ''}`}
                   onClick={() => handleFilter(cat)}
                 >
-                  {cat === 'all' ? 'All Products' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  {cat === 'all'
+                    ? 'All Products'
+                    : cat.charAt(0).toUpperCase() + cat.slice(1)}
                 </button>
               ))}
             </div>
+
 
             <ProductGrid products={filtered} onAdd={addToCart} />
           </section>

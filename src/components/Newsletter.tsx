@@ -19,7 +19,7 @@ export default function Newsletter() {
       const time = now.toTimeString().split(" ")[0]; // HH:mm:ss
   
       const res = await fetch(
-        "https://tundebrain.app.n8n.cloud/webhook/newsletter",
+        "https://thebrain02.app.n8n.cloud/webhook/newsletter",
         {
           method: "POST",
           headers: {

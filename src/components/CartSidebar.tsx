@@ -33,9 +33,7 @@ export default function CartSidebar({
     <div className={`cart-sidebar ${isOpen ? "open" : ""}`}>
       <div className="cart-header">
         <h2>Your Cart</h2>
-        <button className="close-cart" onClick={onClose}>
-          ✕
-        </button>
+        <button className="close-cart" onClick={onClose}>✕</button>
       </div>
 
       <div className="cart-items">
@@ -45,28 +43,23 @@ export default function CartSidebar({
 
         {cartItems.map((item) => (
           <div key={item.id} className="cart-item">
-            <div className="cart-item-image">{item.emoji}</div>
+            <div className="cart-item-image">
+              <img src={item.image} alt={item.name} />
+            </div>
 
             <div className="cart-item-info">
               <div className="cart-item-name">{item.name}</div>
-
               <div className="cart-item-price">
                 ₦{item.price.toLocaleString()} × {item.quantity}
               </div>
 
-              {/* Quantity Controls */}
               <div className="cart-quantity-controls" style={{ marginTop: 8 }}>
                 <button onClick={() => onDecrease(item.id)}>-</button>
                 <span style={{ padding: "0 8px" }}>{item.quantity}</span>
                 <button onClick={() => onIncrease(item.id)}>+</button>
               </div>
 
-              {/* Remove Button */}
-              <button
-                className="remove-btn"
-                onClick={() => onRemove(item.id)}
-                style={{ marginTop: 8 }}
-              >
+              <button className="remove-btn" onClick={() => onRemove(item.id)}>
                 Remove
               </button>
             </div>
@@ -77,10 +70,9 @@ export default function CartSidebar({
       <div className="cart-footer">
         <div className="cart-total">
           <span>Total</span>
-          <span>₦{total.toLocaleString()}</span>
+          <span>${total.toLocaleString()}</span>
         </div>
 
-        {/* Cancel / Clear Cart */}
         <button
           className="cancel-cart-btn"
           onClick={() => {
